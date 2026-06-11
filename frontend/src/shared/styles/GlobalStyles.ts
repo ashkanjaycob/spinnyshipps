@@ -1,5 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
-import parkBg from '../../assets/MainBg.webp';
+import parkBg from '../../assets/shipBg.jpg';
 
 export const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -12,7 +12,7 @@ export const GlobalStyle = createGlobalStyle`
 
   body {
     font-family: 'Inter', sans-serif;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${parkBg});
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.2)), url(${parkBg});
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

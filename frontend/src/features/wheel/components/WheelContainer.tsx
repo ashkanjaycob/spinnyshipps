@@ -1,8 +1,8 @@
 import React from 'react';
 import { WheelContainer as StyledWheelContainer, WheelGlow, WheelLayer, WheelPointer } from './WheelStyles';
-import ring1 from '../../../assets/wheels/Ring1Colorized.png';
-import ring2 from '../../../assets/wheels/Ring2Colorized.png';
-import ring3 from '../../../assets/wheels/Ring3Colorized.png';
+import ring1 from '../../../assets/wheels/wheel1.png';
+import ring2 from '../../../assets/wheels/wheel2.png';
+import ring3 from '../../../assets/wheels/wheel3.png';
 
 interface WheelContainerProps {
   innerRotation: number;
