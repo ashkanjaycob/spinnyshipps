@@ -1,92 +1,180 @@
-# spinyWheely
+# SpinyWheely 🚢
 
-iGaming monorepo — **backend** (NestJS operator API) and **frontend** (React player client), orchestrated with npm workspaces.
+Welcome to the SpinyWheely project repository! This monorepo contains the complete source code for both the **Frontend Player Client** and the **Backend NestJS Operator API**.
 
-## Architecture
+---
 
-```mermaid
-flowchart TB
-  subgraph clients [Clients]
-    WEB[Player Web App]
-    OPS[Operator API clients]
-  end
+## 🎨 Frontend Architecture
 
-  subgraph api [NestJS API]
-    HTTP[REST /player /admin]
-    WS[WebSocket /wheel]
-    WAL[Wallet Settlement]
-    RNG[Game Math RNG]
-  end
+The frontend is a highly-polished React + Vite application featuring intense CSS animations, WebSockets for real-time game results, and a beautiful nautical theme!
 
-  subgraph stores [Data]
-    PG[(PostgreSQL)]
-    RD[(Redis)]
-  end
+### Game Elements & Objects
 
-  WEB --> HTTP
-  WEB --> WS
-  OPS --> HTTP
-  HTTP --> WAL
-  WS --> WAL
-  WAL --> RNG
-  WAL --> PG
-  WAL --> RD
-  WS --> RD
+Here are the core visual objects that make up the game interface:
+
+#### The Ship Background
+The game takes place on an immersive, animated ship deck that rocks with the ocean waves and tracks your mouse movements using a 3D parallax effect.
+
+<img src="frontend/src/assets/shipBg.jpg" alt="Ship Background" width="600"/>
+
+#### The Multi-Tiered Wheels
+The core gameplay mechanic relies on three concentric wheels. The wheels dim when inactive, and brighten progressively as you land on "Next Wheel" triggers!
+
+| Tier 1: Small Wheel | Tier 2: Medium Wheel | Tier 3: Big Wheel |
+|:---:|:---:|:---:|
+| <img src="frontend/src/assets/wheels/wheel1.png" width="200"/> | <img src="frontend/src/assets/wheels/wheel2.png" width="200"/> | <img src="frontend/src/assets/wheels/wheel3.png" width="200"/> |
+| The starting wheel. Land on the red arrow to advance! | The middle tier. Higher stakes and bigger multipliers. | The final tier with massive x10 and x35 payouts! |
+
+### Core Features
+- **Real-time WebSockets**: Connected to the NestJS backend via Socket.IO for instantaneous, secure spin results.
+- **Dynamic CSS Animations**: Uses `styled-components` to create an intense glowing orb background, wheel spin decelerations using custom `cubic-bezier` curves, and sequential wheel activations.
+- **Interactive Parallax Environment**: The background tracks your cursor to shift the perspective dynamically.
+- **Responsive Layout**: Completely responsive layout using `clamp()` and viewport units (`svw`, `dvh`) to prevent ugly scrollbars on mobile.
+- **Celebrations & Audio**: Features toggleable background music and an integrated `react-confetti` explosion when hitting a winning multiplier!
+
+### Quick Start (Frontend)
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-Full diagrams (sequence flows, module map, scaling): **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
+---
 
-| Package | Docs |
-|---------|------|
-| Backend API | [backend/README.md](backend/README.md) |
-| Player client | [frontend/README.md](frontend/README.md) |
-| Tests | [tests/README.md](tests/README.md) |
-| Scaling / K8s | [deploy/SCALING.md](deploy/SCALING.md) |
+## ⚙️ Backend API
 
-## Repository layout
+NestJS operator API for spinyWheely — player HTTP, wheel WebSocket, wallet settlement, and game math.
 
-```
-spiny-wheely/
-├── backend/              # @spiny-wheely/backend — NestJS API
-├── frontend/             # @spiny-wheely/frontend — React + Vite
-├── tests/                # Unit, API, e2e, load tests
-├── docs/                 # Architecture diagrams
-├── deploy/               # Docker nginx, K8s manifests, deploy scripts
-├── docker-compose.yml    # PostgreSQL + Redis
-└── docker-compose.scale.yml  # Multi-instance API POC
-```
+### Stack
 
-## Quick start
+| Layer | Technology |
+|-------|------------|
+| Framework | NestJS 10 |
+| Database | PostgreSQL 16 (TypeORM) |
+| Cache / WS fan-out | Redis 7 (ioredis, Socket.IO adapter) |
+| Real-time | Socket.IO (`/wheel` namespace) |
+| Auth | JWT (player + admin roles) |
+
+### Quick start (Backend)
+
+From the **monorepo root**:
 
 ```bash
 docker compose up -d
 npm install
 cp backend/.env.example backend/.env
 npm run migration:run
-npm run dev
+npm run dev:api
 ```
 
-| Service | URL |
-|---------|-----|
-| Client | http://localhost:5173 |
-| API | http://localhost:3000 |
-| Wheel WS | ws://localhost:3000/wheel |
+API: http://localhost:3000  
+Health: http://localhost:3000/health  
+Wheel WS: \`ws://localhost:3000/wheel\`
 
-## Test accounts
+### Environment
 
-| Role | Email | Password |
-|------|-------|----------|
-| Player | `player@spinywheely.test` | `player123` |
-| Operator | `admin@spinywheely.test` | `admin123` |
+Copy \`.env.example\` → \`.env\` in this directory.
 
-## Scripts
+| Variable | Default | Description |
+|----------|---------|-------------|
+| \`PORT\` | \`3000\` | HTTP listen port |
+| \`DATABASE_*\` | see example | PostgreSQL connection |
+| \`REDIS_HOST\` / \`REDIS_PORT\` | \`localhost\` / \`6379\` | Redis |
+| \`DATABASE_POOL_MAX\` | \`10\` | Connection pool per process |
+| \`JWT_SECRET\` | — | Signing key (change in production) |
+| \`INSTANCE_ID\` | \`HOSTNAME\` | Shown in \`/health\` for load-balancer checks |
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Backend + frontend |
-| `npm run build` | Build both packages |
-| `npm run migration:run` | Database migrations |
-| `npm run test` | Full test suite |
-| `npm run test:load:heavy` | Load / stress test |
-| `npm run scale:up` | 3 API replicas + nginx on :8080 |
-| `npm run k8s:deploy` | Deploy to Kubernetes |
+### Project layout
+
+```
+src/
+├── admin/           # Operator HTTP API
+├── auth/            # JWT, guards (HTTP + WebSocket)
+├── bet-session/     # Wager history persistence (event listener)
+├── common/          # Enums, wager limits, house-edge utils
+├── database/        # Entities, migrations, data-source
+├── game-config/     # RTP / volatility configuration
+├── game-math/wheel/ # Pure RNG engine + segment definitions
+├── games/wheel/     # WebSocket gateway + spin service
+├── health/          # Readiness probes
+├── player/          # Player HTTP API
+├── redis/           # Redis client + IO adapter
+├── wallet/          # Balance cache, debit/credit, events
+├── app.module.ts
+└── main.ts
+```
+
+### HTTP API
+
+#### Player (\`/player\`)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| \`POST\` | \`/player/auth/login\` | — | Returns JWT |
+| \`GET\` | \`/player/profile\` | Player JWT | Balance, currency, limits |
+| \`GET\` | \`/player/wager-history\` | Player JWT | Paginated bet history |
+
+#### Admin (\`/admin\`)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| \`POST\` | \`/admin/auth/login\` | — | Operator JWT |
+| \`GET\` | \`/admin/metrics\` | Admin JWT | Platform RTP / volume |
+| \`GET\` | \`/admin/games/config\` | Admin JWT | Game configurations |
+| \`PATCH\` | \`/admin/games/config/:id\` | Admin JWT | Update RTP, volatility, live flag |
+
+#### Health
+
+| Method | Path | Description |
+|--------|------|-------------|
+| \`GET\` | \`/health\` | Liveness |
+| \`GET\` | \`/health/ready\` | DB + Redis readiness |
+
+### WebSocket — Wheel (\`/wheel\`)
+
+Connect with \`auth: { token: <player JWT> }\`.
+
+| Event (client → server) | Payload | Description |
+|-------------------------|---------|-------------|
+| \`wheel:preview\` | — | Request segment layout |
+| \`wheel:spin\` | \`{ wagerAmount }\` | Place wager and spin |
+
+| Event (server → client) | Description |
+|-------------------------|-------------|
+| \`wheel:preview\` | Segment tables per tier |
+| \`wheel:result\` | Authoritative path, multiplier, balance |
+| \`wheel:error\` | Validation or settlement error |
+| \`wheel:latest\` | Broadcast of latest public result |
+
+### Spin flow
+
+1. Validate wager against \`MIN_WAGER\` / \`MAX_WAGER\` and game config.
+2. **Debit** wager via \`WalletService.settleBet()\` (pessimistic row lock).
+3. Run \`WheelRngEngine\` — small → optional middle → optional big tier.
+4. **Credit** payout if multiplier > 0; \`0x\` keeps the debit.
+5. Cache round in Redis; emit \`wheel:result\`.
+6. \`bet.settled\` event → \`BetSessionListener\` writes history async.
+
+### Scripts
+
+```bash
+npm run dev          # watch mode
+npm run build        # compile to dist/
+npm run start:prod   # node dist/main.js
+npm run migration:run
+```
+
+From monorepo root: \`npm run migration:run\`, \`npm run build:api\`, \`npm run start:api\`.
+
+### Docker
+
+```bash
+# From repo root
+docker build -t spinywheely-api -f backend/Dockerfile .
+```
+
+Multi-instance: see \`deploy/SCALING.md\`.
+
+### Architecture
+
+System-wide diagrams: \`docs/ARCHITECTURE.md\`.
