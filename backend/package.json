@@ -45,6 +45,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.10.2",
     "@types/passport-jwt": "^4.0.1",
+    "@types/yauzl": "^3.3.0",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.2"
