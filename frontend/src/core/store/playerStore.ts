@@ -9,12 +9,14 @@ export interface PlayerState {
   isRoundActive: boolean;
   isReady: boolean;
   playerEmail: string | null;
+  betHistory: any[];
 
   minWager: number;
   maxWager: number;
 
   setWager: (amount: number) => void;
   setBalance: (balance: number, currency?: string) => void;
+  setBetHistory: (history: any[]) => void;
   setReady: (
     email: string,
     balance: number,
@@ -35,9 +37,12 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   isRoundActive: false,
   isReady: false,
   playerEmail: null,
+  betHistory: [],
 
   minWager: 0.1,
   maxWager: 100,
+
+  setBetHistory: (history) => set({ betHistory: history }),
 
   setWager: (amount) =>
     set((state) => {

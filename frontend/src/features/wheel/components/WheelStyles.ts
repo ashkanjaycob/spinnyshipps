@@ -1,4 +1,5 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+import triggerImg from '../../../assets/trigger.png';
 
 export const FeatureContainer = styled.div`
   display: flex;
@@ -27,7 +28,7 @@ export const Title = styled.h1`
   text-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
 `;
 
-export const WheelContainer = styled.div`
+export const StyledWheelContainer = styled.div`
   position: relative;
   width: 100%;
   max-width: clamp(280px, 55vh, 480px);
@@ -64,11 +65,13 @@ export const WheelPointer = styled.div<{ $activeWheel: 'small' | 'middle' | 'big
   position: absolute;
   left: 50%;
   z-index: 10;
-  width: clamp(28px, 9vw, 46px);
-  height: clamp(34px, 11vw, 56px);
-  background: linear-gradient(to bottom, #fff5e6, #ffd700 40%, #b8860b);
-  clip-path: polygon(50% 100%, 0 0, 100% 0);
-  transform: translate(-50%, -100%);
+  width: clamp(32px, 10vw, 52px);
+  height: clamp(32px, 10vw, 52px);
+  background-image: url(${triggerImg});
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform: translate(-50%, -100%) rotate(90deg);
   transition: top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   top: ${props => {
     if (props.$activeWheel === 'small') return '30%';
@@ -76,17 +79,6 @@ export const WheelPointer = styled.div<{ $activeWheel: 'small' | 'middle' | 'big
     return '0%';
   }};
   filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 12px rgba(255, 215, 0, 0.8));
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 4px;
-    right: 4px;
-    bottom: 8px;
-    background: linear-gradient(to bottom, #ffe4b5, #daa520);
-    clip-path: polygon(50% 100%, 0 0, 100% 0);
-  }
 `;
 
 interface WheelLayerProps {
@@ -94,6 +86,7 @@ interface WheelLayerProps {
   $zIndex: number;
   $rotation: number;
   $transitionTime: number;
+  $isActive: boolean;
 }
 
 export const WheelLayer = styled.img<WheelLayerProps>`
@@ -104,9 +97,11 @@ export const WheelLayer = styled.img<WheelLayerProps>`
   height: ${props => props.$size};
   z-index: ${props => props.$zIndex};
   transform: translate(-50%, -50%) rotate(${props => props.$rotation}deg);
-  transition: transform ${props => props.$transitionTime}s cubic-bezier(0.2, 0.8, 0.2, 1);
-  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.7))
-          drop-shadow(0 5px 15px rgba(0, 0, 0, 0.6));
+  transition: transform ${props => props.$transitionTime}s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.5s ease, opacity 0.5s ease;
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, ${props => props.$isActive ? 0.7 : 0}))
+          drop-shadow(0 5px 15px rgba(0, 0, 0, 0.6))
+          ${props => props.$isActive ? 'grayscale(0)' : 'grayscale(100%)'};
+  opacity: ${props => props.$isActive ? 1 : 0.4};
   pointer-events: none;
   user-select: none;
 `;
@@ -288,3 +283,68 @@ export const IconButton = styled(ActionButton)`
   height: 32px;
   font-size: 1.2rem;
 `;
+
+const pulseGlow = keyframes`
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.6))
+            drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.06);
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.95))
+            drop-shadow(0 6px 15px rgba(0, 0, 0, 0.6));
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.6))
+            drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+  }
+`;
+
+export const CenterSpinButton = styled.button<{ $canSpin: boolean }>`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(10px, 6vw, 22px);
+  height: clamp(10px, 6vw, 22px);
+  background: none;
+  border: none;
+  border-color: transparent;
+  background-color: black;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease;
+  animation: ${props => props.$canSpin ? pulseGlow : 'none'} 2s infinite ease-in-out;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translate(-50%, -50%) scale(1.12);
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1))
+            drop-shadow(0 8px 20px rgba(0, 0, 0, 0.7));
+  }
+
+  &:active:not(:disabled) {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+    filter: grayscale(80%) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.4));
+    animation: none;
+  }
+`;
+

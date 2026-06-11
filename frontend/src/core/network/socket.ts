@@ -84,6 +84,18 @@ export class WheelSocketClient {
     });
   }
 
+  fetchHistory(): void {
+    this.socket?.emit('wheel:history');
+  }
+
+  onHistory(callback: (history: any[]) => void): void {
+    this.socket?.on('wheel:history', callback);
+  }
+
+  offHistory(callback: (history: any[]) => void): void {
+    this.socket?.off('wheel:history', callback);
+  }
+
   private toSpinResult(result: BackendWheelResult): SpinResult {
     return {
       path: result.path.map((step) => ({

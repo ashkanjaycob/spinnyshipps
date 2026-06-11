@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { GlobalStyle } from './shared/styles/GlobalStyles';
 import { WheelFeature } from './features/wheel/WheelFeature';
 import { WelcomeModal } from './features/wheel/components/WelcomeModal';
+import { MusicPlayer } from './shared/components/MusicPlayer';
 import { getPlayerProfile, loginPlayer, setAuthToken } from './core/network/api';
 import { getApiUrl } from './core/network/config';
 import { wheelSocket } from './core/network/socket';
@@ -64,6 +65,7 @@ function App() {
     <>
       <GlobalStyle />
       <WelcomeModal />
+      <MusicPlayer />
       {isLoading && <p style={{ color: '#fff', textAlign: 'center' }}>Connecting to spinyWheely…</p>}
       {bootError && (
         <p style={{ color: '#ff6b6b', textAlign: 'center', padding: '1rem' }}>

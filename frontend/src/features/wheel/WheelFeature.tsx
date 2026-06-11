@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { WheelContainer } from './components/WheelContainer';
 import { BetPanel } from './components/BetPanel';
 import { FeatureContainer, Title } from './components/WheelStyles';
+import { WinModal } from './components/WinModal';
+import { BetHistoryPanel } from './components/BetHistoryPanel';
 import { getPlayerProfile } from '../../core/network/api';
 import { usePlayerStore } from '../../core/store/playerStore';
 import { wheelSocket } from '../../core/network/socket';
@@ -39,6 +41,7 @@ export const WheelFeature: React.FC = () => {
   const [activeWheel, setActiveWheel] = useState<WheelTier>('small');
   const [roundStatus, setRoundStatus] = useState<string>('Ready to spin');
   const [isTurbo, setIsTurbo] = useState<boolean>(false);
+  const [winAmount, setWinAmount] = useState<number | null>(null);
 
   const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const animationTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -114,6 +117,7 @@ export const WheelFeature: React.FC = () => {
       resetTimeoutRef.current = null;
     }
     clearAnimationTimeouts();
+    setWinAmount(null);
 
     startRound();
     setRoundStatus('Spinning...');
@@ -126,6 +130,12 @@ export const WheelFeature: React.FC = () => {
       schedule(() => {
         resolveRound(result);
         setRoundStatus(formatResultStatus(result));
+
+        if (result.payoutAmount > 0) {
+          setWinAmount(result.payoutAmount);
+        }
+
+        wheelSocket.fetchHistory();
 
         resetTimeoutRef.current = setTimeout(() => {
           setActiveWheel('small');
@@ -149,13 +159,17 @@ export const WheelFeature: React.FC = () => {
 
   return (
     <FeatureContainer>
-      <Title>spinyWheely</Title>
+      <Title>spinny ships</Title>
       <WheelContainer
         innerRotation={innerRotation}
         middleRotation={middleRotation}
         bigRotation={bigRotation}
         activeWheel={activeWheel}
         transitionTime={isTurbo ? 1.5 : 5}
+        onSpin={handleSpin}
+        isRoundActive={isRoundActive}
+        balance={balance}
+        wagerAmount={wagerAmount}
       />
       <BetPanel
         onSpin={handleSpin}
@@ -169,6 +183,10 @@ export const WheelFeature: React.FC = () => {
         isTurbo={isTurbo}
         onToggleTurbo={() => setIsTurbo(!isTurbo)}
       />
+      <BetHistoryPanel />
+      {winAmount !== null && (
+        <WinModal amount={winAmount} onClose={() => setWinAmount(null)} />
+      )}
     </FeatureContainer>
   );
 };
