@@ -12,20 +12,20 @@ export const GlobalStyle = createGlobalStyle`
 
   body {
     font-family: 'Inter', sans-serif;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.2)), url(${parkBg});
-    background-size: cover;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url(${parkBg});
+    background-size: cover; /* or 150vw depending on zoom requirement, cover usually handles zooming to fit */
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     color: #ffffff;
-    overflow-x: hidden;
-    min-height: 100vh;
+    overflow: hidden;
+    height: 100dvh;
     width: 100svw;
   }
 
   @media (max-width: 768px) {
     body {
-      background-attachment: scroll;
+      background-attachment: fixed;
     }
   }
 
