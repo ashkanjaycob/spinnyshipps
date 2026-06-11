@@ -13,11 +13,16 @@ import { Wallet } from './entities/wallet.entity';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres' as const,
-        host: config.get<string>('DATABASE_HOST', '127.0.0.1'),
-        port: config.get<number>('DATABASE_PORT', 5433),
-        username: config.get<string>('DATABASE_USER', 'spinywheely'),
-        password: config.get<string>('DATABASE_PASSWORD', 'spinywheely'),
-        database: config.get<string>('DATABASE_NAME', 'spinywheely'),
+        url: config.get<string>('DATABASE_URL'),
+        ...(config.get<string>('DATABASE_URL')
+          ? { ssl: { rejectUnauthorized: false } }
+          : {
+              host: config.get<string>('DATABASE_HOST', '127.0.0.1'),
+              port: config.get<number>('DATABASE_PORT', 5433),
+              username: config.get<string>('DATABASE_USER', 'spinywheely'),
+              password: config.get<string>('DATABASE_PASSWORD', 'spinywheely'),
+              database: config.get<string>('DATABASE_NAME', 'spinywheely'),
+            }),
         entities: [User, Wallet, GameConfiguration, BetSession],
         synchronize: config.get<string>('NODE_ENV') === 'development',
         logging: config.get<string>('NODE_ENV') === 'development',
