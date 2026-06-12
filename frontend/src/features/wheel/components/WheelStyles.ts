@@ -110,7 +110,7 @@ export const ControlsContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 8px;
   z-index: 2;
 `;
 
@@ -210,7 +210,7 @@ export const GamePanel = styled.div`
   color: white;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(255, 215, 0, 0.1);
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
 
   .stat {
     font-weight: 600;
@@ -235,13 +235,13 @@ export const GamePanel = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 8px;
-    max-width: 320px;
+    max-width: 370px;
     padding: 10px 15px;
   }
 `;
 
 export const ActionButton = styled.button<{ $active?: boolean }>`
-  background: ${props => props.$active ? 'linear-gradient(135deg, #ffd700, #b8860b)' : 'rgba(30, 58, 138, 0.5)'};
+  background: ${props => props.$active ? 'linear-gradient(135deg, #000000ff, #b8860b)' : 'rgba(30, 58, 138, 0.5)'};
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid ${props => props.$active ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 215, 0, 0.3)'};
