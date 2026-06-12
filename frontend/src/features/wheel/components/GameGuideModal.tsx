@@ -290,7 +290,7 @@ export const GameGuideModal: React.FC<GameGuideModalProps> = ({ onClose }) => {
 
         {/* Stepper */}
         <StepperRow>
-          {SLIDES.map((s, i) => (
+          {SLIDES.map((_, i) => (
             <React.Fragment key={i}>
               <StepDot
                 $active={i === step}
