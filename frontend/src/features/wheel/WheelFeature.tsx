@@ -150,7 +150,7 @@ export const WheelFeature: React.FC = () => {
         resetTimeoutRef.current = setTimeout(() => {
           setActiveWheel('small');
           setRoundStatus('Ready to spin');
-        }, 3000);
+        }, 1000);
       }, totalAnimationMs);
     } catch (error) {
       failRound();

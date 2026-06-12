@@ -27,9 +27,18 @@ const Modal = styled.div`
   border-radius: 24px;
   width: 100%;
   max-width: 520px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 24px 80px rgba(0,0,0,0.8), 0 0 60px rgba(167,139,250,0.15);
   overflow: hidden;
   animation: ${scaleUp} 0.35s cubic-bezier(0.34,1.56,0.64,1);
+
+  @media (max-width: 600px) {
+    width: 95vw;
+    border-radius: 16px;
+    max-height: 95vh;
+  }
 `;
 
 /* ───────── header ───────── */
@@ -38,6 +47,11 @@ const Header = styled.div`
   padding: 24px 28px 16px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
   text-align: center;
+  flex-shrink: 0;
+
+  @media (max-width: 600px) {
+    padding: 16px 20px 12px;
+  }
 `;
 
 const HeaderIcon = styled.div`
@@ -71,6 +85,11 @@ const StepperRow = styled.div`
   justify-content: center;
   gap: 0;
   padding: 20px 28px 0;
+  flex-shrink: 0;
+
+  @media (max-width: 600px) {
+    padding: 16px 16px 0;
+  }
 `;
 
 const StepDot = styled.button<{ $active: boolean; $done: boolean }>`
@@ -122,6 +141,12 @@ const StepLabelText = styled.span<{ $active: boolean }>`
 const SlideWrapper = styled.div`
   padding: 24px 28px;
   min-height: 200px;
+  overflow-y: auto;
+  flex: 1;
+
+  @media (max-width: 600px) {
+    padding: 16px;
+  }
 `;
 
 const SlideContent = styled.div`
@@ -181,6 +206,13 @@ const Footer = styled.div`
   padding: 16px 28px 24px;
   border-top: 1px solid rgba(255,255,255,0.06);
   gap: 12px;
+  flex-shrink: 0;
+
+  @media (max-width: 600px) {
+    padding: 16px;
+    flex-direction: column-reverse;
+    gap: 16px;
+  }
 `;
 
 const NavBtn = styled.button<{ $primary?: boolean }>`
@@ -208,6 +240,12 @@ const NavBtn = styled.button<{ $primary?: boolean }>`
   `}
 
   &:active { transform: translateY(1px); }
+
+  @media (max-width: 600px) {
+    width: 100%;
+    text-align: center;
+    padding: 12px 24px;
+  }
 `;
 
 const SkipBtn = styled.button`
