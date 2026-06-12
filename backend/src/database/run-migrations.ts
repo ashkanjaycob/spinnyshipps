@@ -8,11 +8,16 @@ import { Wallet } from './entities/wallet.entity';
 async function run(): Promise<void> {
   const dataSource = new DataSource({
     type: 'postgres',
-    host: process.env.DATABASE_HOST ?? '127.0.0.1',
-    port: parseInt(process.env.DATABASE_PORT ?? '5433', 10),
-    username: process.env.DATABASE_USER ?? 'spinywheely',
-    password: process.env.DATABASE_PASSWORD ?? 'spinywheely',
-    database: process.env.DATABASE_NAME ?? 'spinywheely',
+    url: process.env.DATABASE_URL,
+    ...(process.env.DATABASE_URL
+      ? { ssl: { rejectUnauthorized: false } }
+      : {
+          host: process.env.DATABASE_HOST ?? '127.0.0.1',
+          port: parseInt(process.env.DATABASE_PORT ?? '5433', 10),
+          username: process.env.DATABASE_USER ?? 'spinywheely',
+          password: process.env.DATABASE_PASSWORD ?? 'spinywheely',
+          database: process.env.DATABASE_NAME ?? 'spinywheely',
+        }),
     entities: [User, Wallet, GameConfiguration, BetSession],
     migrations: [`${__dirname}/migrations/*.{ts,js}`],
     synchronize: false,
