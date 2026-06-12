@@ -14,7 +14,7 @@ interface BetPanelProps {
   onToggleTurbo: () => void;
 }
 
-export const BetPanel: React.FC<BetPanelProps> = ({
+export const BetPanel: React.FC<BetPanelProps & { onOpenPresets: () => void }> = ({
   onSpin,
   isRoundActive,
   roundStatus,
@@ -25,6 +25,7 @@ export const BetPanel: React.FC<BetPanelProps> = ({
   maxWager,
   isTurbo,
   onToggleTurbo,
+  onOpenPresets,
 }) => {
   return (
     <ControlsContainer>
@@ -46,6 +47,9 @@ export const BetPanel: React.FC<BetPanelProps> = ({
             +
           </IconButton>
         </div>
+        <ActionButton onClick={onOpenPresets} disabled={isRoundActive}>
+          💰 Set Bet
+        </ActionButton>
         <ActionButton onClick={onToggleTurbo} disabled={isRoundActive} $active={isTurbo}>
           {isTurbo ? '🚀 Turbo: ON' : '🐢 Turbo: OFF'}
         </ActionButton>

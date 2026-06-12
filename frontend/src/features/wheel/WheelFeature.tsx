@@ -4,6 +4,7 @@ import { FeatureContainer, Title } from './components/WheelStyles';
 import { WinModal } from './components/WinModal';
 import { BetHistoryPanel } from './components/BetHistoryPanel';
 import { BetPresetPanel } from './components/BetPresetPanel';
+import { BetPanel } from './components/BetPanel';
 import { GameGuideModal } from './components/GameGuideModal';
 import { getPlayerProfile } from '../../core/network/api';
 import { usePlayerStore } from '../../core/store/playerStore';
@@ -45,6 +46,8 @@ export const WheelFeature: React.FC = () => {
   const [isTurbo, setIsTurbo] = useState<boolean>(false);
   const [winAmount, setWinAmount] = useState<number | null>(null);
   const [showGuide, setShowGuide] = useState<boolean>(true);
+
+  const [isPresetsOpen, setIsPresetsOpen] = useState<boolean>(false);
 
   const { playWhoosh, playTick, playWin } = useSpinSound();
 
@@ -180,7 +183,7 @@ export const WheelFeature: React.FC = () => {
         wagerAmount={wagerAmount}
       />
 
-      <BetPresetPanel
+      <BetPanel
         wagerAmount={wagerAmount}
         balance={balance}
         minWager={minWager}
@@ -191,7 +194,19 @@ export const WheelFeature: React.FC = () => {
         onSetWager={setWager}
         onToggleTurbo={() => setIsTurbo(!isTurbo)}
         onSpin={handleSpin}
+        onOpenPresets={() => setIsPresetsOpen(true)}
       />
+
+      {isPresetsOpen && (
+        <BetPresetPanel
+          wagerAmount={wagerAmount}
+          balance={balance}
+          minWager={minWager}
+          maxWager={maxWager}
+          onSetWager={setWager}
+          onClose={() => setIsPresetsOpen(false)}
+        />
+      )}
 
       <BetHistoryPanel />
 

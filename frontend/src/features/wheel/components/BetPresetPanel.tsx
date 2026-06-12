@@ -13,8 +13,20 @@ const slideDown = keyframes`
   to   { opacity: 1; transform: translateY(0);     max-height: 200px; }
 `;
 
-/* ─── outer panel ─── */
-const Panel = styled.div`
+/* ─── overlay & modal ─── */
+const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+`;
+
+const ModalPanel = styled.div`
   width: 100%;
   max-width: 420px;
   background: linear-gradient(160deg, #3d1c00 0%, #2a1200 60%, #1a0a00 100%);
@@ -25,16 +37,30 @@ const Panel = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  animation: ${popIn} 0.4s ease both;
+  animation: ${popIn} 0.3s ease both;
 `;
 
-/* ─── bet amount display ─── */
+/* ─── bet display ─── */
 const BetDisplay = styled.div`
   background: rgba(0,0,0,0.35);
   border: 1px solid rgba(255,180,50,0.3);
   border-radius: 12px;
   padding: 10px 16px;
   text-align: center;
+  position: relative;
+`;
+
+const CloseBtn = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #a07040;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  &:hover { color: #fff; }
 `;
 
 const BetLabel = styled.div`
@@ -45,7 +71,6 @@ const BetLabel = styled.div`
   letter-spacing: 1.5px;
   margin-bottom: 2px;
 `;
-
 const BetValue = styled.div`
   font-family: 'Inter', sans-serif;
   font-size: 1.8rem;
@@ -55,13 +80,12 @@ const BetValue = styled.div`
   line-height: 1;
 `;
 
-/* ─── preset chips grid ─── */
+/* ─── preset chips ─── */
 const PresetGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 `;
-
 const PresetChip = styled.button<{ $active: boolean }>`
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
@@ -94,19 +118,17 @@ const PresetChip = styled.button<{ $active: boolean }>`
   &:disabled { opacity: 0.4; cursor: not-allowed; }
 `;
 
-/* ─── advanced / slider section ─── */
+/* ─── advanced slider ─── */
 const AdvancedPanel = styled.div`
   overflow: hidden;
   animation: ${slideDown} 0.3s ease both;
 `;
-
 const SliderRow = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 4px 0;
 `;
-
 const SliderLabel = styled.span<{ $bold?: boolean }>`
   font-family: 'Inter', sans-serif;
   font-size: 0.8rem;
@@ -121,7 +143,6 @@ const SliderLabel = styled.span<{ $bold?: boolean }>`
     padding: 4px 10px;
   `}
 `;
-
 const Slider = styled.input`
   flex: 1;
   -webkit-appearance: none;
@@ -159,7 +180,6 @@ const Slider = styled.input`
     cursor: grab;
   }
 `;
-
 const CurrentValue = styled.div`
   font-family: 'Inter', sans-serif;
   font-size: 0.88rem;
@@ -186,92 +206,33 @@ const ApplyBtn = styled.button`
   box-shadow: 0 4px 20px rgba(255,140,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
   width: 100%;
 
-  &:hover:not(:disabled) {
+  &:hover {
     background: linear-gradient(135deg, #ffb300, #ff5500);
     transform: translateY(-2px);
     box-shadow: 0 8px 28px rgba(255,140,0,0.65);
   }
-  &:active:not(:disabled) { transform: translateY(1px); }
-  &:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+  &:active { transform: translateY(1px); }
 `;
 
-/* ─── turbo + balance row ─── */
-const BottomRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-`;
-
-const BalanceBadge = styled.div`
-  font-family: 'Inter', sans-serif;
-  font-size: 0.85rem;
-  color: #f5d070;
-  background: rgba(255,215,0,0.1);
-  border: 1px solid rgba(255,215,0,0.2);
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-weight: 600;
-  white-space: nowrap;
-`;
-
-const TurboBtn = styled.button<{ $on: boolean }>`
-  font-family: 'Inter', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  white-space: nowrap;
-  border: 1.5px solid ${p => p.$on ? 'rgba(255,200,80,0.8)' : 'rgba(255,255,255,0.15)'};
-  background: ${p => p.$on
-    ? 'linear-gradient(135deg, rgba(255,180,0,0.3), rgba(255,100,0,0.3))'
-    : 'rgba(255,255,255,0.06)'};
-  color: ${p => p.$on ? '#ffd700' : '#94a3b8'};
-  &:hover { border-color: rgba(255,200,80,0.6); color: #ffd700; }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
-`;
-
-/* ─── Status text ─── */
-const Status = styled.p`
-  font-family: 'Inter', sans-serif;
-  font-size: 0.8rem;
-  color: #f5d070;
-  text-align: center;
-  opacity: 0.85;
-  min-height: 1rem;
-  margin: 0;
-  letter-spacing: 0.5px;
-`;
-
-/* ─── types ─── */
+/* ─── presets ─── */
 const PRESETS = [0.70, 1.75, 6.00, 12.50, 40.00];
 
-interface BetPresetPanelProps {
+interface BetPresetModalProps {
   wagerAmount: number;
   balance: number;
   minWager: number;
   maxWager: number;
-  isRoundActive: boolean;
-  roundStatus: string;
-  isTurbo: boolean;
   onSetWager: (amount: number) => void;
-  onToggleTurbo: () => void;
-  onSpin: () => void;
+  onClose: () => void;
 }
 
-export const BetPresetPanel: React.FC<BetPresetPanelProps> = ({
+export const BetPresetPanel: React.FC<BetPresetModalProps> = ({
   wagerAmount,
   balance,
   minWager,
   maxWager,
-  isRoundActive,
-  roundStatus,
-  isTurbo,
   onSetWager,
-  onToggleTurbo,
-  onSpin,
+  onClose,
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [sliderVal, setSliderVal] = useState(wagerAmount);
@@ -296,74 +257,60 @@ export const BetPresetPanel: React.FC<BetPresetPanelProps> = ({
     onSetWager(sliderVal);
   };
 
-  const canSpin = !isRoundActive && balance >= wagerAmount;
-
   return (
-    <Panel>
-      {/* Bet Display */}
-      <BetDisplay>
-        <BetLabel>Bet Amount</BetLabel>
-        <BetValue>{wagerAmount.toFixed(2)}</BetValue>
-      </BetDisplay>
+    <Overlay onClick={onClose}>
+      <ModalPanel onClick={(e) => e.stopPropagation()}>
+        <BetDisplay>
+          <CloseBtn onClick={onClose}>✕</CloseBtn>
+          <BetLabel>Bet Amount</BetLabel>
+          <BetValue>{wagerAmount.toFixed(2)}</BetValue>
+        </BetDisplay>
 
-      {/* Presets */}
-      <PresetGrid>
-        {PRESETS.map(p => (
+        <PresetGrid>
+          {PRESETS.map((p) => (
+            <PresetChip
+              key={p}
+              $active={wagerAmount === parseFloat(p.toFixed(2))}
+              disabled={p > balance}
+              onClick={() => handlePreset(p)}
+            >
+              {p.toFixed(2)}
+            </PresetChip>
+          ))}
           <PresetChip
-            key={p}
-            $active={wagerAmount === parseFloat(p.toFixed(2))}
-            disabled={isRoundActive || p > balance}
-            onClick={() => handlePreset(p)}
+            $active={showAdvanced}
+            onClick={() => setShowAdvanced((v) => !v)}
           >
-            {p.toFixed(2)}
+            Advanced
           </PresetChip>
-        ))}
-        <PresetChip
-          $active={showAdvanced}
-          disabled={isRoundActive}
-          onClick={() => setShowAdvanced(v => !v)}
-        >
-          Advanced
-        </PresetChip>
-      </PresetGrid>
+        </PresetGrid>
 
-      {/* Advanced Slider */}
-      {showAdvanced && (
-        <AdvancedPanel>
-          <SliderRow>
-            <SliderLabel $bold>Min</SliderLabel>
-            <Slider
-              type="range"
-              min={minWager}
-              max={effectiveMax}
-              step={0.05}
-              value={sliderVal}
-              style={{ '--pct': `${pct}%` } as React.CSSProperties}
-              onChange={handleSlider}
-              onMouseUp={handleApplySlider}
-              onTouchEnd={handleApplySlider}
-              disabled={isRoundActive}
-            />
-            <SliderLabel $bold>Max</SliderLabel>
-          </SliderRow>
-          <CurrentValue>{sliderVal.toFixed(2)}</CurrentValue>
-        </AdvancedPanel>
-      )}
+        {showAdvanced && (
+          <AdvancedPanel>
+            <SliderRow>
+              <SliderLabel $bold>Min</SliderLabel>
+              <Slider
+                type="range"
+                min={minWager}
+                max={effectiveMax}
+                step={0.05}
+                value={sliderVal}
+                style={{ '--pct': `${pct}%` } as React.CSSProperties}
+                onChange={handleSlider}
+                onMouseUp={handleApplySlider}
+                onTouchEnd={handleApplySlider}
+              />
+              <SliderLabel $bold>Max</SliderLabel>
+            </SliderRow>
+            <CurrentValue>{sliderVal.toFixed(2)}</CurrentValue>
+          </AdvancedPanel>
+        )}
 
-      {/* Apply Bet */}
-      <ApplyBtn onClick={onSpin} disabled={!canSpin}>
-        {isRoundActive ? 'Spinning…' : 'Apply Bet'}
-      </ApplyBtn>
-
-      {/* Bottom Row */}
-      <BottomRow>
-        <BalanceBadge>💰 ${balance.toFixed(2)}</BalanceBadge>
-        <TurboBtn $on={isTurbo} onClick={onToggleTurbo} disabled={isRoundActive}>
-          {isTurbo ? '⚡ Turbo ON' : '🐢 Turbo OFF'}
-        </TurboBtn>
-      </BottomRow>
-
-      <Status>{roundStatus}</Status>
-    </Panel>
+        <ApplyBtn onClick={onClose}>
+          Apply Bet
+        </ApplyBtn>
+      </ModalPanel>
+    </Overlay>
   );
 };
+
