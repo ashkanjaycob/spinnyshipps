@@ -23,7 +23,13 @@ export class RedisIoAdapter extends IoAdapter {
     const config = this.app.get(ConfigService);
     const host = config.get<string>('REDIS_HOST', '127.0.0.1');
     const port = config.get<number>('REDIS_PORT', 6379);
-    const redisOptions = { host, port, maxRetriesPerRequest: null as null };
+    const password = config.get<string>('REDIS_PASSWORD');
+    const redisOptions = {
+      host,
+      port,
+      ...(password && { password, tls: {} }),
+      maxRetriesPerRequest: null as null,
+    };
 
     this.pubClient = new Redis(redisOptions);
     this.subClient = this.pubClient.duplicate();

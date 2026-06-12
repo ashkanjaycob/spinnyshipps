@@ -1,0 +1,64 @@
+services:
+  - type: web
+    name: spiny-wheely-api
+    runtime: node
+    region: oregon  # change to: frankfurt | singapore | ohio as needed
+    plan: free      # upgrade to 'starter' ($7/mo) to avoid spin-down
+
+    # Render runs these from the repo root
+    buildCommand: npm ci --workspace=@spiny-wheely/backend --include-workspace-root && npm run build:api
+    startCommand: node backend/dist/main.js
+
+    healthCheckPath: /health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_POOL_MAX
+        value: 5  # free Postgres has limited connections
+
+      # Render links these automatically when you attach the Postgres service
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: spiny-wheely-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: spiny-wheely-db
+          property: port
+      - key: DATABASE_USER
+        fromDatabase:
+          name: spiny-wheely-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: spiny-wheely-db
+          property: password
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: spiny-wheely-db
+          property: database
+
+      # Upstash Redis — fill these after creating a free Upstash instance
+      - key: REDIS_HOST
+        sync: false   # paste this value in the Render dashboard
+      - key: REDIS_PORT
+        sync: false
+      - key: REDIS_PASSWORD
+        sync: false   # Upstash requires a password
+
+      # Security — Render auto-generates a random secret on first deploy
+      - key: JWT_SECRET
+        generateValue: true
+
+      # CORS — set to your Vercel URL after first deploy
+      - key: FRONTEND_URL
+        sync: false   # paste your Vercel URL here
+
+databases:
+  - name: spiny-wheely-db
+    databaseName: spinywheely
+    user: spinywheely
+    plan: free  # upgrade to 'starter' ($7/mo) for persistence beyond 90 days

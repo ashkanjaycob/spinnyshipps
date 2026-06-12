@@ -9,7 +9,7 @@
     "tests"
   ],
   "scripts": {
-    "dev": "concurrently -n api,web -c blue,green --kill-others-on-fail \"npm run dev -w @spiny-wheely/backend\" \"wait-on http://127.0.0.1:3000/health -t 60000 && npm run dev -w @spiny-wheely/frontend\"",
+    "dev": "npm run dev:web",
     "dev:api": "npm run dev -w @spiny-wheely/backend",
     "dev:web": "npm run dev -w @spiny-wheely/frontend",
     "build": "npm run build -w @spiny-wheely/backend && npm run build -w @spiny-wheely/frontend",

@@ -10,8 +10,9 @@ async function bootstrap(): Promise<void> {
   await redisAdapter.connectToRedis();
   app.useWebSocketAdapter(redisAdapter);
 
+  const frontendUrl = process.env.FRONTEND_URL;
   app.enableCors({
-    origin: true,
+    origin: frontendUrl ? frontendUrl : true,
     credentials: true,
   });
 
@@ -25,11 +26,11 @@ async function bootstrap(): Promise<void> {
 
   const port = process.env.PORT ?? 3000;
   const instanceId = process.env.INSTANCE_ID ?? process.env.HOSTNAME ?? 'local';
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(
-    `spinyWheely API [${instanceId}] running on http://localhost:${port}`,
+    `spinyWheely API [${instanceId}] running on http://0.0.0.0:${port}`,
   );
-  console.log(`Wheel WebSocket namespace: ws://localhost:${port}/wheel`);
+  console.log(`Wheel WebSocket namespace: ws://0.0.0.0:${port}/wheel`);
 }
 
 bootstrap();
