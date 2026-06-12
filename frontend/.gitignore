@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Env files — ignore the generic .env but commit mode-specific ones
+.env
+# Allow these (they contain no real secrets):
+!.env.development
+!.env.production
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

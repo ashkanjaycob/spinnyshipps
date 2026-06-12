@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { GlobalStyle } from './shared/styles/GlobalStyles';
 import { WheelFeature } from './features/wheel/WheelFeature';
-import { WelcomeModal } from './features/wheel/components/WelcomeModal';
 import { MusicPlayer } from './shared/components/MusicPlayer';
 import { AnimatedBackground } from './shared/components/AnimatedBackground';
+import { LoadingScreen } from './shared/components/LoadingScreen';
 import { getPlayerProfile, loginPlayer, setAuthToken } from './core/network/api';
 import { getApiUrl } from './core/network/config';
 import { wheelSocket } from './core/network/socket';
@@ -62,21 +62,23 @@ function App() {
     };
   }, [setReady]);
 
+  // Show loading screen while connecting OR on error
+  if (isLoading || bootError) {
+    return (
+      <>
+        <GlobalStyle />
+        <AnimatedBackground />
+        <LoadingScreen error={bootError} />
+      </>
+    );
+  }
+
   return (
     <>
       <GlobalStyle />
       <AnimatedBackground />
-      <WelcomeModal />
       <MusicPlayer />
-      {isLoading && <p style={{ color: '#fff', textAlign: 'center' }}>Connecting to spinyWheely…</p>}
-      {bootError && (
-        <p style={{ color: '#ff6b6b', textAlign: 'center', padding: '1rem' }}>
-          {bootError}
-          <br />
-          <small>Run: docker compose up -d && npm run dev</small>
-        </p>
-      )}
-      {!isLoading && !bootError && <WheelFeature />}
+      <WheelFeature />
     </>
   );
 }
